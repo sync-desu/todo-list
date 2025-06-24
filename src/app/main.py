@@ -31,7 +31,9 @@ class App:
             status_label = "⠀EXPIRED⠀"
             status_icon = ":material/skull:"
         st.subheader(task["name"], anchor=False, divider=color)
-        col1, col2, col3 = st.columns([1, 2.8, 1.2], gap="small", vertical_alignment="center")
+        col1, col2, col3 = st.columns(
+            [1, 2.8, 1.2], gap="small", vertical_alignment="center"
+        )
         col1.badge(label=badge_label, color=badge_color, icon=badge_icon)
         if task["is_complete"] or task["is_expired"]:
             col2.badge(label=status_label, color=color, icon=status_icon)
@@ -43,10 +45,17 @@ class App:
         if task["details"] and not str.isspace(task["details"]):
             st.write(task["details"])
         col1, col2 = st.columns([1.4, 0.17], gap="large", vertical_alignment="center")
-        if col1.button(":material/done_outline:", key=f"complete_{key}", disabled=task["is_complete"] or task["is_expired"], help="Mark this task as Complete"):
+        if col1.button(
+            ":material/done_outline:",
+            key=f"complete_{key}",
+            disabled=task["is_complete"] or task["is_expired"],
+            help="Mark this task as Complete",
+        ):
             driver.complete_task(task["name"], priority)
             st.rerun()
-        if col2.button(":material/delete:", key=f"delete_{key}", help="Delete this task"):
+        if col2.button(
+            ":material/delete:", key=f"delete_{key}", help="Delete this task"
+        ):
             driver.remove_task(task["name"], priority)
             st.rerun()
 
@@ -60,14 +69,31 @@ class App:
     def add_task_dialog(self) -> None:
         driver: Driver = st.session_state.driver
         with st.container(key="addtask_form", border=True):
-            task_title = st.text_input(label=" ", placeholder="Title for the task...", label_visibility="collapsed", max_chars=75)
-            task_desc = st.text_input(label=" ", placeholder="Task details (optional)...", label_visibility="collapsed")
-            high_priority = st.toggle("High Priority", disabled=len(driver.high_priority_tasks) == driver.priority_maxsize)
+            task_title = st.text_input(
+                label=" ",
+                placeholder="Title for the task...",
+                label_visibility="collapsed",
+                max_chars=75,
+            )
+            task_desc = st.text_input(
+                label=" ",
+                placeholder="Task details (optional)...",
+                label_visibility="collapsed",
+            )
+            high_priority = st.toggle(
+                "High Priority",
+                disabled=len(driver.high_priority_tasks) == driver.priority_maxsize,
+            )
             expiry_date = None
             if st.toggle("Set Expiry"):
                 expiry_date = st.date_input(label="Date")
             if st.button("Confirm Details", key="formbutton"):
-                driver.add_task(task_title, task_desc, "H" if high_priority else "L", expire=expiry_date)
+                driver.add_task(
+                    task_title,
+                    task_desc,
+                    "H" if high_priority else "L",
+                    expire=expiry_date,
+                )
                 st.rerun()
 
     def dashboard_page(self) -> None:
@@ -82,7 +108,6 @@ class App:
         for task in driver.low_priority_tasks:
             with st.container(key=f"container_{task}", border=True):
                 self.display_task(task, driver.low_priority_tasks[task], "L")
-
 
     def run(self) -> None:
         self.dashboard_page()

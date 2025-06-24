@@ -43,11 +43,20 @@ class Driver:
 
     @property
     def is_full(self) -> bool:
-        if (len(self.low_priority_tasks) == self.priority_maxsize * 2) and (len(self.high_priority_tasks) == self.priority_maxsize):
+        if (len(self.low_priority_tasks) == self.priority_maxsize * 2) and (
+            len(self.high_priority_tasks) == self.priority_maxsize
+        ):
             return True
         return False
 
-    def add_task(self, name: str, details: str | None, priority: Literal["L", "H"], *, expire: date | None = None) -> bool: 
+    def add_task(
+        self,
+        name: str,
+        details: str | None,
+        priority: Literal["L", "H"],
+        *,
+        expire: date | None = None,
+    ) -> bool:
         if priority in ["L", "H"]:
             datastore = None
             maxsize = self.priority_maxsize
@@ -68,7 +77,7 @@ class Driver:
                 "is_complete": False,
                 "completed_at": None,
                 "is_expired": datetime.now().date() >= expire if expire else False,
-                "expires_at": expire.strftime(r"%d-%m-%Y") if expire else expire
+                "expires_at": expire.strftime(r"%d-%m-%Y") if expire else expire,
             }
             self.data_manager.sync()
             return True
@@ -85,8 +94,8 @@ class Driver:
                 datastore = self.high_priority_tasks
             if uid in datastore:
                 datastore[uid]["is_complete"] = True
-                datastore[uid]["completed_at"] = datetime.now().date().strftime(
-                    r"%d-%m-%Y"
+                datastore[uid]["completed_at"] = (
+                    datetime.now().date().strftime(r"%d-%m-%Y")
                 )
                 self.data_manager.sync()
                 return True
@@ -115,27 +124,53 @@ class Driver:
     def check_expiry(self) -> None:
         has_updated = False
         for task in self.low_priority_tasks:
-            if self.low_priority_tasks[task]["expires_at"] and (datetime.now().date() > datetime.strptime(self.low_priority_tasks[task]["expires_at"], r"%d-%m-%Y").date()):
+            if self.low_priority_tasks[task]["expires_at"] and (
+                datetime.now().date()
+                > datetime.strptime(
+                    self.low_priority_tasks[task]["expires_at"], r"%d-%m-%Y"
+                ).date()
+            ):
                 if self.low_priority_tasks[task]["is_expired"] != True:
                     self.low_priority_tasks[task]["is_expired"] = True
                     has_updated = True
-            elif self.low_priority_tasks[task]["expires_at"] and (datetime.now().date() <= datetime.strptime(self.low_priority_tasks[task]["expires_at"], r"%d-%m-%Y").date()):
+            elif self.low_priority_tasks[task]["expires_at"] and (
+                datetime.now().date()
+                <= datetime.strptime(
+                    self.low_priority_tasks[task]["expires_at"], r"%d-%m-%Y"
+                ).date()
+            ):
                 if self.low_priority_tasks[task]["is_expired"] != False:
                     self.low_priority_tasks[task]["is_expired"] = False
                     has_updated = True
-            elif not self.low_priority_tasks[task]["expires_at"] and self.low_priority_tasks[task]["is_expired"] == True:
+            elif (
+                not self.low_priority_tasks[task]["expires_at"]
+                and self.low_priority_tasks[task]["is_expired"] == True
+            ):
                 self.low_priority_tasks[task]["is_expired"] = False
                 has_updated = True
         for task in self.high_priority_tasks:
-            if self.high_priority_tasks[task]["expires_at"] and (datetime.now().date() > datetime.strptime(self.high_priority_tasks[task]["expires_at"], r"%d-%m-%Y").date()):
+            if self.high_priority_tasks[task]["expires_at"] and (
+                datetime.now().date()
+                > datetime.strptime(
+                    self.high_priority_tasks[task]["expires_at"], r"%d-%m-%Y"
+                ).date()
+            ):
                 if self.high_priority_tasks[task]["is_expired"] != True:
                     self.high_priority_tasks[task]["is_expired"] = True
                     has_updated = True
-            elif self.high_priority_tasks[task]["expires_at"] and (datetime.now().date() <= datetime.strptime(self.high_priority_tasks[task]["expires_at"], r"%d-%m-%Y").date()):
+            elif self.high_priority_tasks[task]["expires_at"] and (
+                datetime.now().date()
+                <= datetime.strptime(
+                    self.high_priority_tasks[task]["expires_at"], r"%d-%m-%Y"
+                ).date()
+            ):
                 if self.high_priority_tasks[task]["is_expired"] != False:
                     self.high_priority_tasks[task]["is_expired"] = False
                     has_updated = True
-            elif not self.high_priority_tasks[task]["expires_at"] and self.high_priority_tasks[task]["is_expired"] == True:
+            elif (
+                not self.high_priority_tasks[task]["expires_at"]
+                and self.high_priority_tasks[task]["is_expired"] == True
+            ):
                 self.high_priority_tasks[task]["is_expired"] = False
                 has_updated = True
         if has_updated:
