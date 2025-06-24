@@ -1,4 +1,5 @@
 .venv
+.ruff_cache
 outputs
 __pycache__
 TodoList_Final.zip
