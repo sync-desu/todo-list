@@ -75,6 +75,7 @@ class App:
                 label_visibility="collapsed",
                 max_chars=75,
             )
+            container = st.empty()
             task_desc = st.text_input(
                 label=" ",
                 placeholder="Task details (optional)...",
@@ -89,7 +90,7 @@ class App:
                 expiry_date = st.date_input(label="Date")
             if st.button("Confirm Details", key="formbutton"):
                 driver.add_task(
-                    task_title,
+                    task_title if task_title and not str.isspace(task_title) else "No Title",
                     task_desc,
                     "H" if high_priority else "L",
                     expire=expiry_date,
